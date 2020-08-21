@@ -1,0 +1,96 @@
+<mat-toolbar>
+  <span>VSIP Provi</span>
+  <span class="toolbar-spacer"></span>
+</mat-toolbar>
+
+<div fxLayout="column" fxFlexFill fxLayoutAlign="space-around strech">
+  <form [formGroup]="loginformgroup" (ngSubmit)="login()">
+    <div fxLayout="row wrap" fxLayoutAlign="center center">
+      <div fxLayout="row wrap" fxFlex="65">
+        <mat-card class="card card-body" fxFlex="100">
+          <mat-card-content>
+            <div fxLayout="column" fxFlexFill>
+              <!--  operatorid Form -->
+              <div fxLayout="row" fxFlex="100">
+                <h2>Login</h2>
+              </div>
+              <!--  operatorid Form -->
+              <div fxLayout="row" fxFlex="100">
+                <mat-form-field class="" fxFlexFill>
+                  <mat-label>Operator ID</mat-label>
+                  <input
+                    matInput
+                    placeholder="OPXXXXXXXXXX"
+                    formControlName="operatorid"
+                  />
+                </mat-form-field>
+              </div>
+              <!--  username Form -->
+              <div fxLayout="row" fxFlex="100">
+                <mat-form-field class="" fxFlexFill>
+                  <input
+                    matInput
+                    placeholder="Username"
+                    formControlName="username"
+                  />
+                </mat-form-field>
+              </div>
+              <!--  password Form -->
+              <div fxLayout="row" fxFlex="100">
+                <mat-form-field class="" fxFlexFill>
+                  <input
+                    matInput
+                    placeholder="Password"
+                    type="password"
+                    formControlName="password"
+                  />
+                </mat-form-field>
+              </div>
+              <!--  vpgid Form -->
+              <div fxLayout="row" fxFlex="100" fxLayoutGap="18px">
+                <mat-form-field class="" fxFlex="70" fxFlexFill>
+                  <mat-label>VPG ID</mat-label>
+                  <input
+                    matInput
+                    placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                    formControlName="vpgid"
+                  />
+                </mat-form-field>
+                <mat-form-field class="" fxFlex="30" fxFlexFill>
+                  <mat-label>Coverage Type</mat-label>
+                  <mat-select formControlName="coverageType">
+                    <mat-option
+                      *ngFor="let coverageType of coverageTypes"
+                      [value]="coverageType.value"
+                    >
+                      {{ coverageType.viewValue }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <div
+                fxLayout="row"
+                fxFlex="100"
+                fxLayoutGap="12px"
+                fxLayoutAlign="start end"
+              >
+                <button
+                  mat-raised-button
+                  color="primary"
+                  [disabled]="loginformgroup.invalid"
+                >
+                  Login
+                </button>
+                <mat-error>{{ errorMessage }}</mat-error>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+        <ng-container *ngIf="loading">
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        </ng-container>
+      </div>
+    </div>
+  </form>
+</div>

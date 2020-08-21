@@ -1,1 +1,125 @@
 /* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/theming";
+@include mat-core();
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  background-color: #f8f8f8;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+$mat-custom-primary: (
+  50: #e2e2ed,
+  100: #b7b7d2,
+  200: #8787b4,
+  300: #565696,
+  400: #323280,
+  500: #0e0e69,
+  600: #0c0c61,
+  700: #0a0a56,
+  800: #08084c,
+  900: #04043b,
+  A100: #7171ff,
+  A200: #3e3eff,
+  A400: #0b0bff,
+  A700: #0000f1,
+  contrast: (
+    50: #000000,
+    100: #000000,
+    200: #000000,
+    300: #ffffff,
+    400: #ffffff,
+    500: #ffffff,
+    600: #ffffff,
+    700: #ffffff,
+    800: #ffffff,
+    900: #ffffff,
+    A100: #000000,
+    A200: #ffffff,
+    A400: #ffffff,
+    A700: #ffffff,
+  ),
+);
+
+//
+$mat-custom-warn: (
+  50: #ffe1e0,
+  100: #ffb5b3,
+  200: #ff8480,
+  300: #ff524d,
+  400: #ff2d26,
+  500: #ff0800,
+  600: #ff0700,
+  700: #ff0600,
+  800: #ff0400,
+  900: #ff0200,
+  A100: #ffffff,
+  A200: #fff2f2,
+  A400: #ffbfbf,
+  A700: #ffa6a6,
+  contrast: (
+    50: #000000,
+    100: #000000,
+    200: #000000,
+    300: #000000,
+    400: #ffffff,
+    500: #ffffff,
+    600: #ffffff,
+    700: #ffffff,
+    800: #ffffff,
+    900: #ffffff,
+    A100: #000000,
+    A200: #000000,
+    A400: #000000,
+    A700: #000000,
+  ),
+);
+//
+$mat-custom-accent: (
+  50: #fdefe7,
+  100: #fbd7c2,
+  200: #f9bc9a,
+  300: #f6a171,
+  400: #f48d52,
+  500: #f27934,
+  600: #f0712f,
+  700: #ee6627,
+  800: #ec5c21,
+  900: #e84915,
+  A100: #ffffff,
+  A200: #ffeae5,
+  A400: #ffc2b2,
+  A700: #ffae98,
+  contrast: (
+    50: #000000,
+    100: #000000,
+    200: #000000,
+    300: #000000,
+    400: #000000,
+    500: #000000,
+    600: #000000,
+    700: #000000,
+    800: #000000,
+    900: #ffffff,
+    A100: #000000,
+    A200: #000000,
+    A400: #000000,
+    A700: #000000,
+  ),
+);
+
+$app-custom-primary: mat-palette($mat-custom-primary, 500);
+$app-custom-warn: mat-palette($mat-custom-warn, 500);
+$app-custom-accent: mat-palette($mat-custom-accent, 500);
+
+$app-custom-theme: mat-light-theme(
+  $app-custom-primary,
+  $app-custom-accent,
+  $app-custom-warn
+);
+
+@include angular-material-theme($app-custom-theme);
