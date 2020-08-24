@@ -38,10 +38,19 @@ export class VpgService {
     vpgId: string,
     coverageType: string
   ): Observable<IpAddressMapEntry[]> {
-    const url =
-      'https://api.soracom.io/v1/virtual_private_gateways/' +
-      `${vpgId}` +
-      '/ip_address_map';
+    let url = '';
+    if (coverageType === 'jp') {
+      url =
+        'https://api.soracom.io/v1/virtual_private_gateways/' +
+        `${vpgId}` +
+        '/ip_address_map';
+    } else if (coverageType === 'g') {
+      url =
+        'https://g.api.soracom.io/v1/virtual_private_gateways/' +
+        `${vpgId}` +
+        '/ip_address_map';
+    }
+
     const token = localStorage.getItem('token');
     const apiKey = localStorage.getItem('apiKey');
     const httpOptions = {
@@ -60,10 +69,18 @@ export class VpgService {
     ipAddressMapEntry: IpAddressMapEntry,
     coverageType: string
   ): Observable<IpAddressMapEntry> {
-    const url =
-      'https://api.soracom.io/v1/virtual_private_gateways/' +
-      `${vpgId}` +
-      '/ip_address_map';
+    let url = '';
+    if (coverageType === 'jp') {
+      url =
+        'https://api.soracom.io/v1/virtual_private_gateways/' +
+        `${vpgId}` +
+        '/ip_address_map';
+    } else if (coverageType === 'g') {
+      url =
+        'https://g.api.soracom.io/v1/virtual_private_gateways/' +
+        `${vpgId}` +
+        '/ip_address_map';
+    }
     const token = localStorage.getItem('token');
     const apiKey = localStorage.getItem('apiKey');
     const httpOptions = {
@@ -89,11 +106,21 @@ export class VpgService {
     key: string,
     coverageType: string
   ): Observable<{}> {
-    const url =
-      'https://api.soracom.io/v1/virtual_private_gateways/' +
-      `${vpgId}` +
-      '/ip_address_map/' +
-      `${key}`;
+    let url = '';
+    if (coverageType === 'jp') {
+      url =
+        'https://api.soracom.io/v1/virtual_private_gateways/' +
+        `${vpgId}` +
+        '/ip_address_map' +
+        `${key}`;
+    } else if (coverageType === 'g') {
+      url =
+        'https://g.api.soracom.io/v1/virtual_private_gateways/' +
+        `${vpgId}` +
+        '/ip_address_map' +
+        `${key}`;
+    }
+
     const token = localStorage.getItem('token');
     const apiKey = localStorage.getItem('apiKey');
     const httpOptions = {

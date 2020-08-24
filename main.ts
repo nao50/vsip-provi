@@ -29,17 +29,17 @@ function createWindow(): void {
   });
 }
 
-// app.on('ready', createWindow);
-app.on('ready', () => {
-  session.defaultSession.resolveProxy(
-    'https://www.google.com/',
-    (proxyInfo) => {
-      console.log('proxyInfo', proxyInfo);
-      localStorage.setItem('proxyInfo', proxyInfo);
-    }
-  );
-  createWindow();
-});
+app.on('ready', createWindow);
+// app.on('ready', () => {
+//   session.defaultSession.resolveProxy(
+//     'https://www.google.com/',
+//     (proxyInfo) => {
+//       console.log('proxyInfo', proxyInfo);
+//       localStorage.setItem('proxyInfo', proxyInfo);
+//     }
+//   );
+//   createWindow();
+// });
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
