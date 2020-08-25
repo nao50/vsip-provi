@@ -146,6 +146,7 @@ export class VpgComponent implements OnInit {
     this.errorMessage = '';
     const IpAddress: string[] = [];
     // NULL非許容チェック
+    console.log('obj', obj);
     // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < obj.length; i++) {
       Object.keys(obj[i]).forEach((key) => {
@@ -197,7 +198,7 @@ export class VpgComponent implements OnInit {
   // csv to IpAddressMapEntry Object
   csv2Object(csvString: string): IpAddressMapEntry[] {
     this.errorMessage = '';
-    const line = csvString.split('\r\n');
+    const line = csvString.split('\r\n').filter((l) => l[0] && l[1]);
     const headers = line[0].split(',');
     const jsonArray: IpAddressMapEntry[] = [];
 
