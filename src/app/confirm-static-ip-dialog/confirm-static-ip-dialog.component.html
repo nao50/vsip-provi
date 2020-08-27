@@ -1,5 +1,5 @@
-<div fxLayout="column">
-  <div fxFlex="90" fxLayout="row wrap">
+<div fxLayout="column" fxLayoutGap="10px">
+  <div fxFlex="100" fxLayout="row wrap">
     <div fxLayoutAlign="start center">
       <h3 mat-dialog-title class="dialog-title">
         Configure this Static IP List
@@ -7,12 +7,12 @@
     </div>
   </div>
 
-  <div fxLayout="row" fxFlex="85" fxLayoutAlign="center center">
+  <mat-dialog-content>
     <table
       mat-table
       [dataSource]="confirmDataSource"
       class="mat-elevation-z2"
-      fxFlex="85"
+      fxFlex="100"
     >
       <ng-container matColumnDef="IMSI">
         <th mat-header-cell *matHeaderCellDef>IMSI</th>
@@ -31,20 +31,24 @@
         class="element-row"
       ></tr>
     </table>
-  </div>
+  </mat-dialog-content>
 
-  <div
-    mat-dialog-actions
-    fxLayout="row"
-    fxLayoutAlign="end center"
-    style="margin-top: 8px;"
-  >
-    <div>
-      <button mat-raised-button color="warn" (click)="cancel()">Cancel</button>
-      <span style="margin: 16px 8px;"></span>
-      <button mat-raised-button color="primary" (click)="upload()">
-        Upload
-      </button>
+  <mat-dialog-actions align="end">
+    <div
+      mat-dialog-actions
+      fxLayout="row"
+      fxLayoutAlign="end center"
+      style="margin-top: 8px;"
+    >
+      <div>
+        <button mat-raised-button color="warn" (click)="cancel()">
+          Cancel
+        </button>
+        <span style="margin: 16px 8px;"></span>
+        <button mat-raised-button color="primary" (click)="upload()">
+          Upload
+        </button>
+      </div>
     </div>
-  </div>
+  </mat-dialog-actions>
 </div>

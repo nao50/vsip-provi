@@ -108,7 +108,7 @@ export class VpgComponent implements OnInit {
       const IpAddressMapEntryArray = this.csv2Object(String(reader.result));
       if (this.validationIpAddressMapEntry(IpAddressMapEntryArray)) {
         const dialogRef = this.dialog.open(ConfirmStaticIpDialogComponent, {
-          width: '32.5rem',
+          width: '50rem',
           disableClose: true,
           data: { ip: IpAddressMapEntryArray, vpgId: this.vpgId },
         });
