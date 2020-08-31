@@ -111,7 +111,7 @@ export class VpgService {
       url =
         'https://api.soracom.io/v1/virtual_private_gateways/' +
         `${vpgId}` +
-        '/ip_address_map' +
+        '/ip_address_map/' +
         `${key}`;
     } else if (coverageType === 'g') {
       url =
