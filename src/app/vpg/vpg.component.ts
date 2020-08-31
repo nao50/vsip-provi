@@ -21,11 +21,18 @@ export class VpgComponent implements OnInit {
   vpgId: string;
   coverageType: string;
   loading = false;
+  // deleteLoading = false;
+  deleteLoading: boolean;
   ipAddressMapEntry: IpAddressMapEntry[];
   alreadyExistsIpAddress: string[];
   virtualPrivateGateway: VirtualPrivateGateway = {};
   staticIPDataSource: MatTableDataSource<IpAddressMapEntry>;
-  staticIPDisplayedColumns: string[] = ['IMSI', 'IPAddress', 'Action'];
+  staticIPDisplayedColumns: string[] = [
+    'IMSI',
+    'IPAddress',
+    'Assign',
+    'Action',
+  ];
   invalidChars = /^.*?(?=[\^#%&$\*:<>\?\/\{\|\}[a-zA-Z]).*$/;
 
   constructor(
@@ -81,7 +88,10 @@ export class VpgComponent implements OnInit {
           console.log('this.ipAddressMapEntry:', this.ipAddressMapEntry);
           this.staticIPDataSource = new MatTableDataSource(
             this.ipAddressMapEntry.filter((ipAddressMapEntry) => {
-              return ipAddressMapEntry.type === 'static';
+              return (
+                ipAddressMapEntry.type === 'static' ||
+                ipAddressMapEntry.type === 'dynamic'
+              );
             })
           );
           this.loading = false;
@@ -124,6 +134,7 @@ export class VpgComponent implements OnInit {
   }
 
   delete(ipAddressMapEntry: IpAddressMapEntry): void {
+    this.deleteLoading = true;
     this.vpgService
       .deleteVirtualPrivateGatewayIpAddressMapEntry(
         this.vpgId,
@@ -134,6 +145,9 @@ export class VpgComponent implements OnInit {
         this.vpgId = this.activatedRoute.snapshot.paramMap.get('vpgId');
         this.getVirtualPrivateGateway(this.vpgId);
         this.listVirtualPrivateGatewayIpAddressMapEntries(this.vpgId);
+        setTimeout(() => {
+          this.deleteLoading = false;
+        }, 1100);
       });
   }
 
@@ -146,7 +160,6 @@ export class VpgComponent implements OnInit {
     this.errorMessage = '';
     const IpAddress: string[] = [];
     // NULL非許容チェック
-    console.log('obj', obj);
     // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < obj.length; i++) {
       Object.keys(obj[i]).forEach((key) => {

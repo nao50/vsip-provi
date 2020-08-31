@@ -159,12 +159,24 @@
         <td mat-cell *matCellDef="let element">{{ element.ipAddress }}</td>
       </ng-container>
 
+      <ng-container matColumnDef="Assign">
+        <th mat-header-cell *matHeaderCellDef>IP Assign</th>
+        <td mat-cell *matCellDef="let element">{{ element.type }}</td>
+      </ng-container>
+
       <ng-container matColumnDef="Action">
         <th mat-header-cell *matHeaderCellDef>Action</th>
         <td mat-cell *matCellDef="let element" fxLayoutGap="5px">
-          <button mat-mini-fab color="warn" (click)="delete(element)">
-            <mat-icon>delete</mat-icon>
-          </button>
+          <ng-container *ngIf="element.type === 'static'">
+            <button
+              mat-mini-fab
+              color="warn"
+              [disabled]="deleteLoading"
+              (click)="delete(element)"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </ng-container>
         </td>
       </ng-container>
 
