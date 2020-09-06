@@ -63,14 +63,18 @@ export class ConfirmStaticIpDialogComponent implements OnInit {
             this.data.ip[i],
             this.coverageType
           )
-          .subscribe((res) => {
-            console.log(res);
-            if (i === this.data.ip.length - 1) {
+          .subscribe(
+            (res) => {
+              if (i === this.data.ip.length - 1) {
+                this.loading = false;
+                this.overlayRef.detach();
+                this.dialogRef.close();
+              }
+            },
+            (error) => {
               this.loading = false;
-              this.overlayRef.detach();
-              this.dialogRef.close();
             }
-          });
+          );
       }, DELAY_BETWEEN_CALLS * i);
     }
   }

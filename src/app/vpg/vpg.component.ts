@@ -68,6 +68,7 @@ export class VpgComponent implements OnInit {
           this.loading = false;
         },
         (error) => {
+          this.loading = false;
           this.authService.logout();
         }
       );
@@ -97,6 +98,7 @@ export class VpgComponent implements OnInit {
           this.loading = false;
         },
         (error) => {
+          this.loading = false;
           this.authService.logout();
         }
       );
@@ -141,14 +143,20 @@ export class VpgComponent implements OnInit {
         ipAddressMapEntry.key,
         this.coverageType
       )
-      .subscribe((res) => {
-        this.vpgId = this.activatedRoute.snapshot.paramMap.get('vpgId');
-        this.getVirtualPrivateGateway(this.vpgId);
-        this.listVirtualPrivateGatewayIpAddressMapEntries(this.vpgId);
-        setTimeout(() => {
+      .subscribe(
+        (res) => {
+          this.vpgId = this.activatedRoute.snapshot.paramMap.get('vpgId');
+          this.getVirtualPrivateGateway(this.vpgId);
+          this.listVirtualPrivateGatewayIpAddressMapEntries(this.vpgId);
+          setTimeout(() => {
+            this.deleteLoading = false;
+          }, 3000);
+        },
+        (error) => {
+          console.log(error);
           this.deleteLoading = false;
-        }, 1100);
-      });
+        }
+      );
   }
 
   logout(): void {
