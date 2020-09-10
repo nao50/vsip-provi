@@ -11,6 +11,7 @@ import { VpgService } from '../services/vpg.service';
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { MatSpinner } from '@angular/material/progress-spinner';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-confirm-static-ip-dialog',
@@ -53,7 +54,7 @@ export class ConfirmStaticIpDialogComponent implements OnInit {
   upload(): void {
     this.loading = true;
     this.overlayRef.attach(new ComponentPortal(MatSpinner));
-    const DELAY_BETWEEN_CALLS = 1000;
+    const DELAY_BETWEEN_CALLS = 3000;
     // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < this.data.ip.length; i++) {
       setTimeout(() => {
@@ -71,8 +72,18 @@ export class ConfirmStaticIpDialogComponent implements OnInit {
                 this.dialogRef.close();
               }
             },
-            (error) => {
-              this.loading = false;
+            (error: HttpErrorResponse) => {
+              console.log(error);
+              if (error.status === 429) {
+                this.loading = false;
+                this.overlayRef.detach();
+                this.dialogRef.close('tooManyReq');
+                return;
+              } else {
+                this.loading = false;
+                this.overlayRef.detach();
+                this.dialogRef.close('unknownError');
+              }
             }
           );
       }, DELAY_BETWEEN_CALLS * i);

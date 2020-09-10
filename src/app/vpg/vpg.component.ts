@@ -1,21 +1,27 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { VirtualPrivateGateway, IpAddressMapEntry } from '../interfaces/vpg';
 import { AuthService } from '../services/auth.service';
 import { VpgService } from '../services/vpg.service';
 import { ConfirmStaticIpDialogComponent } from '../confirm-static-ip-dialog/confirm-static-ip-dialog.component';
-//
+
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Overlay } from '@angular/cdk/overlay';
+import { ComponentPortal } from '@angular/cdk/portal';
+import { MatSpinner } from '@angular/material/progress-spinner';
+import { MatPaginator } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-vpg',
   templateUrl: './vpg.component.html',
   styleUrls: ['./vpg.component.scss'],
 })
-export class VpgComponent implements OnInit {
+export class VpgComponent implements OnInit, AfterViewInit {
   @ViewChild('fileInput') fileInput;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
   errorMessage = '';
   toolbarMenuString: string;
   vpgId: string;
@@ -35,7 +41,18 @@ export class VpgComponent implements OnInit {
   ];
   invalidChars = /^.*?(?=[\^#%&$\*:<>\?\/\{\|\}[a-zA-Z]).*$/;
 
+  //
+  overlayRef = this.overlay.create({
+    hasBackdrop: true,
+    positionStrategy: this.overlay
+      .position()
+      .global()
+      .centerHorizontally()
+      .centerVertically(),
+  });
+
   constructor(
+    private overlay: Overlay,
     private authService: AuthService,
     private vpgService: VpgService,
     private activatedRoute: ActivatedRoute,
@@ -48,6 +65,10 @@ export class VpgComponent implements OnInit {
     this.vpgId = this.activatedRoute.snapshot.paramMap.get('vpgId');
     this.getVirtualPrivateGateway(this.vpgId);
     this.listVirtualPrivateGatewayIpAddressMapEntries(this.vpgId);
+  }
+
+  ngAfterViewInit(): void {
+    // this.staticIPDataSource.paginator = this.paginator;
   }
 
   setUsername(): void {
@@ -63,8 +84,8 @@ export class VpgComponent implements OnInit {
     this.vpgService
       .getVirtualPrivateGateway(vpgId, this.coverageType)
       .subscribe(
-        (res: VirtualPrivateGateway) => {
-          this.virtualPrivateGateway = res;
+        (res) => {
+          this.virtualPrivateGateway = res.body;
           this.loading = false;
         },
         (error) => {
@@ -81,8 +102,10 @@ export class VpgComponent implements OnInit {
     this.vpgService
       .listVirtualPrivateGatewayIpAddressMapEntries(vpgId, this.coverageType)
       .subscribe(
-        (res: IpAddressMapEntry[]) => {
-          this.ipAddressMapEntry = res;
+        (res) => {
+          console.log('res.headers:', res.headers);
+          // this.ipAddressMapEntry = res.body;
+          this.ipAddressMapEntry.push.apply(this.ipAddressMapEntry, res.body);
           this.ipAddressMapEntry.filter((ipAddressMapEntry) => {
             this.alreadyExistsIpAddress.push(ipAddressMapEntry.ipAddress);
           });
@@ -95,6 +118,7 @@ export class VpgComponent implements OnInit {
               );
             })
           );
+          this.staticIPDataSource.paginator = this.paginator;
           this.loading = false;
         },
         (error) => {
@@ -114,6 +138,7 @@ export class VpgComponent implements OnInit {
 
   //
   onChangeFileInput(file: File): void {
+    this.errorMessage = '';
     const reader = new FileReader();
     reader.readAsText(file[0]);
     reader.onload = () => {
@@ -124,7 +149,10 @@ export class VpgComponent implements OnInit {
           disableClose: true,
           data: { ip: IpAddressMapEntryArray, vpgId: this.vpgId },
         });
-        dialogRef.afterClosed().subscribe(() => {
+        dialogRef.afterClosed().subscribe((result: string) => {
+          if (result === 'result') {
+            this.errorMessage = 'Please try it after a while.';
+          }
           this.vpgId = this.activatedRoute.snapshot.paramMap.get('vpgId');
           this.getVirtualPrivateGateway(this.vpgId);
           this.listVirtualPrivateGatewayIpAddressMapEntries(this.vpgId);
@@ -137,6 +165,8 @@ export class VpgComponent implements OnInit {
 
   delete(ipAddressMapEntry: IpAddressMapEntry): void {
     this.deleteLoading = true;
+    this.errorMessage = '';
+    this.overlayRef.attach(new ComponentPortal(MatSpinner));
     this.vpgService
       .deleteVirtualPrivateGatewayIpAddressMapEntry(
         this.vpgId,
@@ -149,12 +179,22 @@ export class VpgComponent implements OnInit {
           this.getVirtualPrivateGateway(this.vpgId);
           this.listVirtualPrivateGatewayIpAddressMapEntries(this.vpgId);
           setTimeout(() => {
+            this.overlayRef.detach();
             this.deleteLoading = false;
-          }, 3000);
+          }, 4000);
         },
-        (error) => {
+        (error: HttpErrorResponse) => {
           console.log(error);
-          this.deleteLoading = false;
+          if (error.status === 429) {
+            this.errorMessage = 'Please try it after a while.';
+            setTimeout(() => {
+              this.overlayRef.detach();
+              this.deleteLoading = false;
+            }, 10000);
+          } else {
+            this.overlayRef.detach();
+            this.deleteLoading = false;
+          }
         }
       );
   }
@@ -167,6 +207,13 @@ export class VpgComponent implements OnInit {
   validationIpAddressMapEntry(obj: IpAddressMapEntry[]): boolean {
     this.errorMessage = '';
     const IpAddress: string[] = [];
+    // CSV ファイルの行数チェック（101行まで許容）
+    if (obj.length > 100) {
+      console.log('CSV ファイルの行数チェック（101行まで許容）');
+      this.errorMessage =
+        'Invalid csv files. Too many lines in file, you can upload 101 lines or less.';
+      return false;
+    }
     // NULL非許容チェック
     // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < obj.length; i++) {

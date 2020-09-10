@@ -31,7 +31,12 @@ import { VpgComponent } from './vpg/vpg.component';
 import { ConfirmStaticIpDialogComponent } from './confirm-static-ip-dialog/confirm-static-ip-dialog.component';
 
 @NgModule({
-  declarations: [AppComponent, LoginComponent, VpgComponent, ConfirmStaticIpDialogComponent],
+  declarations: [
+    AppComponent,
+    LoginComponent,
+    VpgComponent,
+    ConfirmStaticIpDialogComponent,
+  ],
   imports: [
     BrowserModule,
     AppRoutingModule,

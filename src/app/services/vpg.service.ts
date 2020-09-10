@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { VirtualPrivateGateway, IpAddressMapEntry } from '../interfaces/vpg';
-import { Observable } from 'rxjs';
+import { Observable, empty } from 'rxjs';
+import { expand, map, reduce } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +14,7 @@ export class VpgService {
   getVirtualPrivateGateway(
     vpgId: string,
     coverageType: string
-  ): Observable<VirtualPrivateGateway> {
+  ): Observable<HttpResponse<VirtualPrivateGateway>> {
     let url = '';
     if (coverageType === 'jp') {
       url = 'https://api.soracom.io/v1/virtual_private_gateways/' + `${vpgId}`;
@@ -23,21 +24,23 @@ export class VpgService {
     }
     const token = localStorage.getItem('token');
     const apiKey = localStorage.getItem('apiKey');
-    const httpOptions = {
+
+    // return this.http.get<VirtualPrivateGateway>(url, httpOptions);
+    return this.http.get<VirtualPrivateGateway>(url, {
+      observe: 'response',
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         'X-Soracom-Token': token,
         'X-Soracom-API-Key': apiKey,
       }),
-    };
-    return this.http.get<VirtualPrivateGateway>(url, httpOptions);
+    });
   }
 
   //
   listVirtualPrivateGatewayIpAddressMapEntries(
     vpgId: string,
     coverageType: string
-  ): Observable<IpAddressMapEntry[]> {
+  ): Observable<HttpResponse<IpAddressMapEntry[]>> {
     let url = '';
     if (coverageType === 'jp') {
       url =
@@ -53,14 +56,33 @@ export class VpgService {
 
     const token = localStorage.getItem('token');
     const apiKey = localStorage.getItem('apiKey');
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'X-Soracom-Token': token,
-        'X-Soracom-API-Key': apiKey,
-      }),
+
+    const getLink = (
+      linkUrl?: string
+    ): Observable<HttpResponse<IpAddressMapEntry[]>> => {
+      if (linkUrl) {
+        url = linkUrl;
+      }
+      return this.http.get<IpAddressMapEntry[]>(url, {
+        observe: 'response',
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+          'X-Soracom-Token': token,
+          'X-Soracom-API-Key': apiKey,
+        }),
+      });
     };
-    return this.http.get<IpAddressMapEntry[]>(url, httpOptions);
+
+    return getLink().pipe(
+      expand((res: HttpResponse<IpAddressMapEntry[]>) => {
+        if (res.headers.get('Link')) {
+          const nextLink = res.headers.get('Link');
+          return getLink(nextLink);
+        } else {
+          return empty();
+        }
+      })
+    );
   }
 
   // POST /virtual_private_gateways/{vpg_id}/ip_address_map putVirtualPrivateGatewayIpAddressMapEntry
@@ -68,7 +90,7 @@ export class VpgService {
     vpgId: string,
     ipAddressMapEntry: IpAddressMapEntry,
     coverageType: string
-  ): Observable<IpAddressMapEntry> {
+  ): Observable<HttpResponse<IpAddressMapEntry>> {
     let url = '';
     if (coverageType === 'jp') {
       url =
@@ -83,20 +105,21 @@ export class VpgService {
     }
     const token = localStorage.getItem('token');
     const apiKey = localStorage.getItem('apiKey');
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'X-Soracom-Token': token,
-        'X-Soracom-API-Key': apiKey,
-      }),
-    };
+
     return this.http.post<IpAddressMapEntry>(
       url,
       JSON.stringify({
         key: ipAddressMapEntry.key,
         ipAddress: ipAddressMapEntry.ipAddress,
       }),
-      httpOptions
+      {
+        observe: 'response',
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+          'X-Soracom-Token': token,
+          'X-Soracom-API-Key': apiKey,
+        }),
+      }
     );
   }
 
@@ -105,7 +128,7 @@ export class VpgService {
     vpgId: string,
     key: string,
     coverageType: string
-  ): Observable<{}> {
+  ): Observable<HttpResponse<{}>> {
     let url = '';
     if (coverageType === 'jp') {
       url =
@@ -123,13 +146,15 @@ export class VpgService {
 
     const token = localStorage.getItem('token');
     const apiKey = localStorage.getItem('apiKey');
-    const httpOptions = {
+
+    // return this.http.delete(url, httpOptions);
+    return this.http.delete(url, {
+      observe: 'response',
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         'X-Soracom-Token': token,
         'X-Soracom-API-Key': apiKey,
       }),
-    };
-    return this.http.delete(url, httpOptions);
+    });
   }
 }
